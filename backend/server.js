@@ -25,9 +25,9 @@ const httpServer = createServer(app);
 // Allow both common frontend ports for development (5173, 5174)
 // and also read from FRONTEND_URL, API_URL, and API_PRODUCTION_URL env vars if set
 const allowedOrigins = [
+  'https://sparkly-pastelito-b0cd3e.netlify.app',
   'http://localhost:5173',
-  'http://localhost:5174',
-  'http://a8cosos0ogw80cw0skgk0kc8.127.0.0.1.sslip.io'
+  'http://localhost:5174'
 ];
 
 // Add production URLs from environment variables
