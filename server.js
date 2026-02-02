@@ -25,9 +25,9 @@ const httpServer = createServer(app);
 // Allow both common frontend ports for development (5173, 5174)
 // and also read from FRONTEND_URL, API_URL, and API_PRODUCTION_URL env vars if set
 const allowedOrigins = [
-  'https://sparkly-pastelito-b0cd3e.netlify.app',
+  'https://gpay-ss.netlify.app',
   'http://localhost:5173',
-  'http://localhost:5174',
+  'http://localhost:5174'
 ];
 
 // Add production URLs from environment variables
@@ -52,15 +52,42 @@ const io = new SocketIOServer(httpServer, {
 setIO(io);
 
 // Middleware
-app.use(cors(
-  {
-  'allowedHeaders': ['sessionId', 'Content-Type'],
-  'exposedHeaders': ['sessionId'],
-  'origin': '*',
-  'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  'preflightContinue': false
-}
-));
+
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   allowedHeaders: ['sessionId', 'Content-type', 'authorization'],
+//   exposedHeaders: ['sessionId'],
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   preflightContinue: false
+// }));
+
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'sessionId'
+  ],
+  exposedHeaders: ['sessionId'],
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -104,11 +131,6 @@ app.use('/api/withdrawals', withdrawalRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
-});
-
-// Root route for GET /
-app.get('/', (req, res) => {
-  res.send('Backend API is running.');
 });
 
 // Socket.io Real-time notifications
